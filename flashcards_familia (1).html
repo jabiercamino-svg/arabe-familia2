@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards Árabe – La Familia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: #110a1a;
+      color: #e8d8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 20px 48px;
+    }
+
+    h1 {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      color: #b07adb;
+      text-align: center;
+      margin-bottom: 2px;
+      direction: rtl;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      font-weight: 300;
+      color: #3a2848;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .category-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+      max-width: 800px;
+    }
+
+    .tab {
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid #3a2848;
+      background: transparent;
+      color: #5a3878;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab:hover { border-color: #b07adb; color: #b07adb; }
+    .tab.active {
+      background: #b07adb;
+      color: #110a1a;
+      border-color: #b07adb;
+      font-weight: 700;
+    }
+
+    .search-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: 1px solid #3a2848;
+      background: #0a0610;
+      color: #e8d8f0;
+      font-size: 15px;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input::placeholder { color: #3a2848; }
+    .search-wrap input:focus { border-color: #b07adb; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 10px 28px;
+      border-radius: 30px;
+      border: 1px solid #3a2848;
+      background: transparent;
+      color: #e8d8f0;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+    }
+    .btn:hover { background: #1e1028; border-color: #b07adb; color: #b07adb; }
+    .btn:active { transform: scale(0.97); }
+    .btn.active { background: #b07adb; color: #110a1a; border-color: #b07adb; }
+
+    #counter {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #3a2848;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .card-wrap {
+      width: 100%;
+      max-width: 640px;
+      height: 430px;
+      perspective: 1200px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .card-inner.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 28px 36px;
+      text-align: center;
+    }
+    .face.front { background: #0a0610; border: 1px solid #3a2848; }
+    .face.back  { background: #180d28; border: 1px solid #b07adb; transform: rotateY(180deg); }
+
+    /* ── FRONT ── */
+    .category-label {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #3a2848;
+      padding: 4px 14px;
+      border: 1px solid #3a2848;
+      border-radius: 20px;
+      margin-bottom: 2px;
+    }
+
+    .gender-tag {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin-bottom: 2px;
+    }
+    .gender-tag.masc { color: #7ab4db; border: 1px solid #2a4a5a; }
+    .gender-tag.fem  { color: #db7aa0; border: 1px solid #5a2a40; }
+    .gender-tag.both { color: #b07adb; border: 1px solid #5a3878; }
+
+    .front-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .arabic-sg {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 52px;
+      direction: rtl;
+      color: #b07adb;
+      line-height: 1.2;
+    }
+    .front-divider {
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: #3a2848;
+    }
+    .arabic-pl {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 36px;
+      direction: rtl;
+      color: #7a4aaa;
+      line-height: 1.2;
+    }
+
+    .front-dual {
+      display: flex;
+      width: 100%;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .front-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .front-col-divider {
+      width: 1px;
+      background: #3a2848;
+      align-self: stretch;
+      margin: 0 12px;
+    }
+    .arabic-sg-masc {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 40px;
+      direction: rtl;
+      color: #7ab4db;
+      line-height: 1.2;
+    }
+    .arabic-pl-masc {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 27px;
+      direction: rtl;
+      color: #4a7aaa;
+      line-height: 1.2;
+    }
+    .arabic-sg-fem {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 40px;
+      direction: rtl;
+      color: #db7aa0;
+      line-height: 1.2;
+    }
+    .arabic-pl-fem {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 27px;
+      direction: rtl;
+      color: #aa4a70;
+      line-height: 1.2;
+    }
+    .col-pl-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #3a2848;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #3a2848;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ── BACK single ── */
+    .back-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+    .back-person-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #5a3878;
+      margin-bottom: 1px;
+    }
+    .back-arabic-sg {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 32px;
+      direction: rtl;
+      color: #b07adb;
+      line-height: 1.2;
+    }
+    .back-roman-sg { font-size: 16px; font-style: italic; color: #7a5098; font-weight: 300; }
+    .back-meaning { font-size: 20px; font-weight: 700; color: #e8d8f0; }
+    .back-arabic-pl {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 24px;
+      direction: rtl;
+      color: #7a4aaa;
+      line-height: 1.2;
+    }
+    .back-roman-pl { font-size: 14px; font-style: italic; color: #5a3878; font-weight: 300; }
+    .back-meaning-pl { font-size: 15px; color: #b090c8; }
+    .back-divider { width: 50px; height: 1px; background: #3a2848; margin: 7px 0; }
+    .back-pl-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #3a2848; }
+
+    /* ── BACK dual ── */
+    .back-dual {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .back-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .back-col-divider { width: 1px; background: #3a2848; align-self: stretch; margin: 0 10px; }
+
+    .back-arabic-sg-m { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 26px; direction: rtl; color: #7ab4db; line-height: 1.2; }
+    .back-arabic-pl-m { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 20px; direction: rtl; color: #4a7aaa; }
+    .back-arabic-sg-f { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 26px; direction: rtl; color: #db7aa0; line-height: 1.2; }
+    .back-arabic-pl-f { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 20px; direction: rtl; color: #aa4a70; }
+
+    .back-roman-m     { font-size: 13px; font-style: italic; color: #3a6a8a; font-weight: 300; }
+    .back-roman-f     { font-size: 13px; font-style: italic; color: #8a3a60; font-weight: 300; }
+    .back-roman-pl-m  { font-size: 11px; font-style: italic; color: #2a4a6a; font-weight: 300; }
+    .back-roman-pl-f  { font-size: 11px; font-style: italic; color: #6a2a48; font-weight: 300; }
+    .back-meaning-m   { font-size: 15px; font-weight: 700; color: #7ab4db; }
+    .back-meaning-f   { font-size: 15px; font-weight: 700; color: #db7aa0; }
+    .back-meaning-pl-m{ font-size: 12px; color: #4a7aaa; }
+    .back-meaning-pl-f{ font-size: 12px; color: #aa4a70; }
+    .back-pl-label-m  { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #2a4a6a; }
+    .back-pl-label-f  { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #6a2a48; }
+
+    .help {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #3a2848;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .no-results { font-size: 16px; color: #3a2848; }
+
+    @media (max-width: 500px) {
+      .arabic-sg { font-size: 38px; }
+      .arabic-pl { font-size: 28px; }
+      .arabic-sg-masc, .arabic-sg-fem { font-size: 30px; }
+      .card-wrap { height: 460px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>العائلة</h1>
+  <div class="subtitle">Flashcards · La Familia · Singular / Plural</div>
+
+  <div class="category-tabs" id="tabs"></div>
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Buscar: padre, prima, suegra..." oninput="filterCards()">
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="prevCard()">⬅ Anterior</button>
+    <button class="btn" onclick="flipCard()">🔄 Girar</button>
+    <button class="btn" onclick="nextCard()">Siguiente ➡</button>
+    <button class="btn" id="randomBtn" onclick="toggleRandom()">🔀 Aleatorio: NO</button>
+    <button class="btn" onclick="shuffleCards()">⇄ Mezclar</button>
+  </div>
+
+  <div id="counter">— / —</div>
+
+  <div class="card-wrap" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <div class="face front" id="front"></div>
+      <div class="face back"  id="back"></div>
+    </div>
+  </div>
+
+  <div class="help">espacio = girar · ← → = navegar</div>
+
+  <script>
+  const family = [
+
+    // ══ Padres e hijos ══════════════════════════════════════
+    { type:'dual', cat:'Padres e hijos',
+      mSg:'أَب',       mSgR:'ab',          mSgM:'padre',
+      mPl:'آبَاء',     mPlR:'ābāʾ',        mPlM:'padres',
+      fSg:'أُمّ',      fSgR:'umm',          fSgM:'madre',
+      fPl:'أُمَّهَات', fPlR:'ummahāt',     fPlM:'madres' },
+
+    { type:'dual', cat:'Padres e hijos',
+      mSg:'ابْن',      mSgR:'ibn',          mSgM:'hijo',
+      mPl:'أَبْنَاء',  mPlR:'abnāʾ',       mPlM:'hijos',
+      fSg:'بِنْت',     fSgR:'bint',         fSgM:'hija',
+      fPl:'بَنَات',    fPlR:'banāt',        fPlM:'hijas' },
+
+    { type:'dual', cat:'Padres e hijos',
+      mSg:'وَلَد',     mSgR:'walad',        mSgM:'niño / chico',
+      mPl:'أَوْلَاد',  mPlR:'awlād',       mPlM:'niños / chicos',
+      fSg:'فَتَاة',    fSgR:'fatāh',        fSgM:'chica / joven',
+      fPl:'فَتَيَات',  fPlR:'fatayāt',     fPlM:'chicas' },
+
+    { type:'single', cat:'Padres e hijos',
+      sg:'طِفْل',      sgR:'ṭifl',          sgM:'bebé / niño pequeño',
+      pl:'أَطْفَال',   plR:'aṭfāl',        plM:'bebés / niños pequeños' },
+
+    { type:'single', cat:'Padres e hijos',
+      sg:'مَوْلُود',   sgR:'mawlūd',        sgM:'recién nacido',
+      pl:'مَوَالِيد',  plR:'mawālīd',      plM:'recién nacidos' },
+
+    { type:'dual', cat:'Padres e hijos',
+      mSg:'بِكْر',     mSgR:'bikr',         mSgM:'primogénito',
+      mPl:'أَبْكَار',  mPlR:'abkār',       mPlM:'primogénitos',
+      fSg:'بِكْرَة',   fSgR:'bikra',        fSgM:'primogénita',
+      fPl:'بِكَرَات',  fPlR:'bikarāt',     fPlM:'primogénitas' },
+
+    // ══ Abuelos ══════════════════════════════════════════════
+    { type:'dual', cat:'Abuelos',
+      mSg:'جَدّ',      mSgR:'jadd',         mSgM:'abuelo',
+      mPl:'أَجْدَاد',  mPlR:'ajdād',       mPlM:'abuelos',
+      fSg:'جَدَّة',    fSgR:'jadda',        fSgM:'abuela',
+      fPl:'جَدَّات',   fPlR:'jaddāt',      fPlM:'abuelas' },
+
+    { type:'dual', cat:'Abuelos',
+      mSg:'جَدّ كَبِير', mSgR:'jadd kabīr', mSgM:'bisabuelo',
+      mPl:'أَجْدَاد كِبَار', mPlR:'ajdād kibār', mPlM:'bisabuelos',
+      fSg:'جَدَّة كَبِيرَة', fSgR:'jadda kabīra', fSgM:'bisabuela',
+      fPl:'جَدَّات كَبِيرَات', fPlR:'jaddāt kabīrāt', fPlM:'bisabuelas' },
+
+    { type:'dual', cat:'Abuelos',
+      mSg:'حَفِيد',    mSgR:'ḥafīd',        mSgM:'nieto',
+      mPl:'أَحْفَاد',  mPlR:'aḥfād',       mPlM:'nietos',
+      fSg:'حَفِيدَة',  fSgR:'ḥafīda',       fSgM:'nieta',
+      fPl:'حَفِيدَات', fPlR:'ḥafīdāt',     fPlM:'nietas' },
+
+    { type:'dual', cat:'Abuelos',
+      mSg:'سِبْط',     mSgR:'sibṭ',         mSgM:'bisnieto',
+      mPl:'أَسْبَاط',  mPlR:'asbāṭ',       mPlM:'bisnietos',
+      fSg:'سِبْطَة',   fSgR:'sibṭa',        fSgM:'bisnieta',
+      fPl:'سِبْطَات',  fPlR:'sibṭāt',      fPlM:'bisnietas' },
+
+    // ══ Hermanos ═════════════════════════════════════════════
+    { type:'dual', cat:'Hermanos',
+      mSg:'أَخ',       mSgR:'akh',          mSgM:'hermano',
+      mPl:'إِخْوَة',   mPlR:'ikhwa',        mPlM:'hermanos',
+      fSg:'أُخْت',     fSgR:'ukht',         fSgM:'hermana',
+      fPl:'أَخَوَات',  fPlR:'akhawāt',     fPlM:'hermanas' },
+
+    { type:'dual', cat:'Hermanos',
+      mSg:'أَخ أَكْبَر', mSgR:'akh akbar',  mSgM:'hermano mayor',
+      mPl:'إِخْوَة أَكْبَر', mPlR:'ikhwa akbar', mPlM:'hermanos mayores',
+      fSg:'أُخْت كُبْرَى', fSgR:'ukht kubrā', fSgM:'hermana mayor',
+      fPl:'أَخَوَات كُبْرَى', fPlR:'akhawāt kubrā', fPlM:'hermanas mayores' },
+
+    { type:'dual', cat:'Hermanos',
+      mSg:'أَخ أَصْغَر', mSgR:'akh aṣghar', mSgM:'hermano menor',
+      mPl:'إِخْوَة أَصْغَر', mPlR:'ikhwa aṣghar', mPlM:'hermanos menores',
+      fSg:'أُخْت صُغْرَى', fSgR:'ukht ṣughrā', fSgM:'hermana menor',
+      fPl:'أَخَوَات صُغْرَى', fPlR:'akhawāt ṣughrā', fPlM:'hermanas menores' },
+
+    { type:'dual', cat:'Hermanos',
+      mSg:'تَوْأَم',   mSgR:'tawʾam',       mSgM:'gemelo',
+      mPl:'تَوَائِم',  mPlR:'tawāʾim',     mPlM:'gemelos',
+      fSg:'تَوْأَمَة', fSgR:'tawʾama',      fSgM:'gemela',
+      fPl:'تَوَائِم',  fPlR:'tawāʾim',     fPlM:'gemelas' },
+
+    // ══ Tíos ═════════════════════════════════════════════════
+    { type:'dual', cat:'Tíos',
+      mSg:'عَمّ',      mSgR:'ʿamm',         mSgM:'tío paterno',
+      mPl:'أَعْمَام',  mPlR:'aʿmām',       mPlM:'tíos paternos',
+      fSg:'عَمَّة',    fSgR:'ʿamma',        fSgM:'tía paterna',
+      fPl:'عَمَّات',   fPlR:'ʿammāt',      fPlM:'tías paternas' },
+
+    { type:'dual', cat:'Tíos',
+      mSg:'خَال',      mSgR:'khāl',         mSgM:'tío materno',
+      mPl:'أَخْوَال',  mPlR:'akhwāl',      mPlM:'tíos maternos',
+      fSg:'خَالَة',    fSgR:'khāla',        fSgM:'tía materna',
+      fPl:'خَالَات',   fPlR:'khālāt',      fPlM:'tías maternas' },
+
+    // ══ Primos ═══════════════════════════════════════════════
+    { type:'dual', cat:'Primos',
+      mSg:'اِبْن عَمّ',  mSgR:'ibn ʿamm',   mSgM:'primo paterno',
+      mPl:'أَبْنَاء عَمّ', mPlR:'abnāʾ ʿamm', mPlM:'primos paternos',
+      fSg:'بِنْت عَمّ',  fSgR:'bint ʿamm',   fSgM:'prima paterna',
+      fPl:'بَنَات عَمّ', fPlR:'banāt ʿamm', fPlM:'primas paternas' },
+
+    { type:'dual', cat:'Primos',
+      mSg:'اِبْن خَال',  mSgR:'ibn khāl',   mSgM:'primo materno',
+      mPl:'أَبْنَاء خَال', mPlR:'abnāʾ khāl', mPlM:'primos maternos',
+      fSg:'بِنْت خَال',  fSgR:'bint khāl',   fSgM:'prima materna',
+      fPl:'بَنَات خَال', fPlR:'banāt khāl', fPlM:'primas maternas' },
+
+    // ══ Sobrinos ═════════════════════════════════════════════
+    { type:'dual', cat:'Sobrinos',
+      mSg:'اِبْن أَخ',  mSgR:'ibn akh',    mSgM:'sobrino (hijo de hermano)',
+      mPl:'أَبْنَاء إِخْوَة', mPlR:'abnāʾ ikhwa', mPlM:'sobrinos',
+      fSg:'بِنْت أَخ',  fSgR:'bint akh',   fSgM:'sobrina (hija de hermano)',
+      fPl:'بَنَات إِخْوَة', fPlR:'banāt ikhwa', fPlM:'sobrinas' },
+
+    { type:'dual', cat:'Sobrinos',
+      mSg:'اِبْن أُخْت', mSgR:'ibn ukht',  mSgM:'sobrino (hijo de hermana)',
+      mPl:'أَبْنَاء أَخَوَات', mPlR:'abnāʾ akhawāt', mPlM:'sobrinos',
+      fSg:'بِنْت أُخْت', fSgR:'bint ukht', fSgM:'sobrina (hija de hermana)',
+      fPl:'بَنَات أَخَوَات', fPlR:'banāt akhawāt', fPlM:'sobrinas' },
+
+    // ══ Pareja ═══════════════════════════════════════════════
+    { type:'dual', cat:'Pareja',
+      mSg:'زَوْج',     mSgR:'zawj',         mSgM:'marido / esposo',
+      mPl:'أَزْوَاج',  mPlR:'azwāj',       mPlM:'maridos / esposos',
+      fSg:'زَوْجَة',   fSgR:'zawja',        fSgM:'mujer / esposa',
+      fPl:'زَوْجَات',  fPlR:'zawjāt',      fPlM:'esposas' },
+
+    { type:'dual', cat:'Pareja',
+      mSg:'خَطِيب',    mSgR:'khaṭīb',       mSgM:'novio / prometido',
+      mPl:'خُطَبَاء',  mPlR:'khuṭabāʾ',    mPlM:'novios / prometidos',
+      fSg:'خَطِيبَة',  fSgR:'khaṭība',      fSgM:'novia / prometida',
+      fPl:'خَطِيبَات', fPlR:'khaṭībāt',    fPlM:'novias / prometidas' },
+
+    { type:'dual', cat:'Pareja',
+      mSg:'عَرِيس',    mSgR:'ʿarīs',        mSgM:'novio (en la boda)',
+      mPl:'عُرَسَاء',  mPlR:'ʿurasāʾ',     mPlM:'novios (en la boda)',
+      fSg:'عَرُوس',    fSgR:'ʿarūs',        fSgM:'novia (en la boda)',
+      fPl:'عَرَائِس',  fPlR:'ʿarāʾis',     fPlM:'novias (en la boda)' },
+
+    { type:'dual', cat:'Pareja',
+      mSg:'مُطَلَّق',  mSgR:'muṭallaq',     mSgM:'divorciado',
+      mPl:'مُطَلَّقُون', mPlR:'muṭallaqūn', mPlM:'divorciados',
+      fSg:'مُطَلَّقَة', fSgR:'muṭallaqa',   fSgM:'divorciada',
+      fPl:'مُطَلَّقَات', fPlR:'muṭallaqāt', fPlM:'divorciadas' },
+
+    { type:'dual', cat:'Pareja',
+      mSg:'أَرْمَل',   mSgR:'armal',        mSgM:'viudo',
+      mPl:'أَرَامِل',  mPlR:'arāmil',      mPlM:'viudos',
+      fSg:'أَرْمَلَة', fSgR:'armala',       fSgM:'viuda',
+      fPl:'أَرَامِل',  fPlR:'arāmil',      fPlM:'viudas' },
+
+    // ══ Suegros ══════════════════════════════════════════════
+    { type:'dual', cat:'Suegros',
+      mSg:'حَمٌّ',     mSgR:'ḥamm',         mSgM:'suegro',
+      mPl:'أَحْمَاء',  mPlR:'aḥmāʾ',       mPlM:'suegros',
+      fSg:'حَمَاة',    fSgR:'ḥamāh',        fSgM:'suegra',
+      fPl:'حَمَوَات',  fPlR:'ḥamawāt',     fPlM:'suegras' },
+
+    { type:'dual', cat:'Suegros',
+      mSg:'صِهْر',     mSgR:'ṣihr',         mSgM:'yerno',
+      mPl:'أَصْهَار',  mPlR:'aṣhār',       mPlM:'yernos',
+      fSg:'كَنَّة',    fSgR:'kanna',         fSgM:'nuera',
+      fPl:'كَنَّات',   fPlR:'kannāt',       fPlM:'nueras' },
+
+    // ══ Cuñados ══════════════════════════════════════════════
+    { type:'dual', cat:'Cuñados',
+      mSg:'صِهْر',     mSgR:'ṣihr',         mSgM:'cuñado',
+      mPl:'أَصْهَار',  mPlR:'aṣhār',       mPlM:'cuñados',
+      fSg:'سِلْفَة',   fSgR:'silfa',         fSgM:'cuñada',
+      fPl:'سِلْفَات',  fPlR:'silfāt',       fPlM:'cuñadas' },
+
+    { type:'dual', cat:'Cuñados',
+      mSg:'أَخُو الزَّوْج', mSgR:'akhū z-zawj', mSgM:'cuñado (herm. del marido)',
+      mPl:'إِخْوَة الزَّوْج', mPlR:'ikhwat z-zawj', mPlM:'cuñados (del marido)',
+      fSg:'أُخْتُ الزَّوْجَة', fSgR:'ukhtu z-zawja', fSgM:'cuñada (herm. de la mujer)',
+      fPl:'أَخَوَات الزَّوْجَة', fPlR:'akhawāt z-zawja', fPlM:'cuñadas (de la mujer)' },
+
+    // ══ Padrastros / hermanastros ════════════════════════════
+    { type:'dual', cat:'Familia política',
+      mSg:'زَوْج الأُمّ', mSgR:'zawj al-umm', mSgM:'padrastro',
+      mPl:'أَزْوَاج الأُمَّهَات', mPlR:'azwāj al-ummahāt', mPlM:'padrastros',
+      fSg:'زَوْجَة الأَب', fSgR:'zawjat al-ab', fSgM:'madrastra',
+      fPl:'زَوْجَات الآبَاء', fPlR:'zawjāt al-ābāʾ', fPlM:'madrastras' },
+
+    { type:'dual', cat:'Familia política',
+      mSg:'أَخٌ غَيْرُ شَقِيق', mSgR:'akh ghayr shaqīq', mSgM:'hermanastro',
+      mPl:'إِخْوَة غَيْر أَشِقَّاء', mPlR:'ikhwa ghayr ashiqqāʾ', mPlM:'hermanastros',
+      fSg:'أُخْتٌ غَيْرُ شَقِيقَة', fSgR:'ukht ghayr shaqīqa', fSgM:'hermanastra',
+      fPl:'أَخَوَات غَيْر شَقِيقَات', fPlR:'akhawāt ghayr shaqīqāt', fPlM:'hermanastras' },
+
+    { type:'dual', cat:'Familia política',
+      mSg:'اِبْن مُتَبَنَّى', mSgR:'ibn mutabannā', mSgM:'hijo adoptivo',
+      mPl:'أَبْنَاء مُتَبَنَّوْن', mPlR:'abnāʾ mutabannawūn', mPlM:'hijos adoptivos',
+      fSg:'بِنْت مُتَبَنَّاة', fSgR:'bint mutabannāh', fSgM:'hija adoptiva',
+      fPl:'بَنَات مُتَبَنَّيَات', fPlR:'banāt mutabannayāt', fPlM:'hijas adoptivas' },
+
+    // ══ Padrinos / tutores ═══════════════════════════════════
+    { type:'dual', cat:'Padrinos',
+      mSg:'عَرَّاب',   mSgR:'ʿarrāb',       mSgM:'padrino',
+      mPl:'عَرَّابُون', mPlR:'ʿarrābūn',    mPlM:'padrinos',
+      fSg:'عَرَّابَة',  fSgR:'ʿarrāba',      fSgM:'madrina',
+      fPl:'عَرَّابَات', fPlR:'ʿarrābāt',    fPlM:'madrinas' },
+
+    { type:'dual', cat:'Padrinos',
+      mSg:'وَلِيّ',    mSgR:'waliyy',        mSgM:'tutor / guardián',
+      mPl:'أَوْلِيَاء', mPlR:'awliyāʾ',    mPlM:'tutores / guardianes',
+      fSg:'وَلِيَّة',  fSgR:'waliyya',       fSgM:'tutora',
+      fPl:'وَلِيَّات', fPlR:'waliyyāt',    fPlM:'tutoras' },
+
+    // ══ Edad y generación ════════════════════════════════════
+    { type:'dual', cat:'Edad',
+      mSg:'كَبِير',    mSgR:'kabīr',         mSgM:'mayor / anciano',
+      mPl:'كِبَار',    mPlR:'kibār',         mPlM:'mayores / ancianos',
+      fSg:'كَبِيرَة',  fSgR:'kabīra',        fSgM:'mayor / anciana',
+      fPl:'كَبِيرَات', fPlR:'kabīrāt',      fPlM:'mayores / ancianas' },
+
+    { type:'dual', cat:'Edad',
+      mSg:'صَغِير',    mSgR:'ṣaghīr',        mSgM:'pequeño / joven',
+      mPl:'صِغَار',    mPlR:'ṣighār',        mPlM:'pequeños / jóvenes',
+      fSg:'صَغِيرَة',  fSgR:'ṣaghīra',       fSgM:'pequeña / joven',
+      fPl:'صَغِيرَات', fPlR:'ṣaghīrāt',     fPlM:'pequeñas / jóvenes' },
+
+    { type:'dual', cat:'Edad',
+      mSg:'شَابّ',     mSgR:'shābb',          mSgM:'joven (adulto)',
+      mPl:'شَبَاب',    mPlR:'shabāb',         mPlM:'jóvenes (adultos)',
+      fSg:'شَابَّة',   fSgR:'shābba',          fSgM:'joven (adulta)',
+      fPl:'شَابَّات',  fPlR:'shābbāt',        fPlM:'jóvenes (adultas)' },
+
+    { type:'dual', cat:'Edad',
+      mSg:'مُرَاهِق',  mSgR:'murāhiq',       mSgM:'adolescente (chico)',
+      mPl:'مُرَاهِقُون', mPlR:'murāhiqūn',   mPlM:'adolescentes',
+      fSg:'مُرَاهِقَة', fSgR:'murāhiqa',     fSgM:'adolescente (chica)',
+      fPl:'مُرَاهِقَات', fPlR:'murāhiqāt',   fPlM:'adolescentes' },
+
+    // ══ Palabras generales de familia ════════════════════════
+    { type:'single', cat:'General',
+      sg:'عَائِلَة',   sgR:'ʿāʾila',         sgM:'familia',
+      pl:'عَائِلَات',  plR:'ʿāʾilāt',       plM:'familias' },
+
+    { type:'single', cat:'General',
+      sg:'أَهْل',      sgR:'ahl',             sgM:'familia / gente de uno',
+      pl:'أَهَالِي',   plR:'ahālī',          plM:'familias / parientes' },
+
+    { type:'single', cat:'General',
+      sg:'قَرِيب',     sgR:'qarīb',           sgM:'pariente (genérico)',
+      pl:'أَقَارِب',   plR:'aqārib',         plM:'parientes' },
+
+    { type:'single', cat:'General',
+      sg:'نَسَب',      sgR:'nasab',           sgM:'linaje / ascendencia',
+      pl:'أَنْسَاب',   plR:'ansāb',          plM:'linajes' },
+
+    { type:'single', cat:'General',
+      sg:'جِيل',       sgR:'jīl',             sgM:'generación',
+      pl:'أَجْيَال',   plR:'ajyāl',          plM:'generaciones' },
+
+    { type:'single', cat:'General',
+      sg:'ذُرِّيَّة',  sgR:'dhurriyya',       sgM:'descendencia / prole',
+      pl:'ذُرِّيَّات', plR:'dhurriyyāt',     plM:'descendencias' },
+
+    { type:'single', cat:'General',
+      sg:'سَلَف',      sgR:'salaf',           sgM:'antepasado',
+      pl:'أَسْلَاف',   plR:'aslāf',          plM:'antepasados' },
+
+    { type:'dual', cat:'General',
+      mSg:'يَتِيم',    mSgR:'yatīm',          mSgM:'huérfano',
+      mPl:'أَيْتَام',  mPlR:'aytām',         mPlM:'huérfanos',
+      fSg:'يَتِيمَة',  fSgR:'yatīma',         fSgM:'huérfana',
+      fPl:'يَتِيمَات', fPlR:'yatīmāt',       fPlM:'huérfanas' },
+
+    { type:'dual', cat:'General',
+      mSg:'وَحِيد',    mSgR:'waḥīd',          mSgM:'hijo único',
+      mPl:'وَحِيدُون', mPlR:'waḥīdūn',       mPlM:'hijos únicos',
+      fSg:'وَحِيدَة',  fSgR:'waḥīda',         fSgM:'hija única',
+      fPl:'وَحِيدَات', fPlR:'waḥīdāt',       fPlM:'hijas únicas' },
+
+  ];
+
+  const categories = ['Todas', ...new Set(family.map(w => w.cat))];
+  let activeCategory = 'Todas';
+
+  const tabsEl = document.getElementById('tabs');
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (cat === 'Todas' ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => selectCategory(cat);
+    tabsEl.appendChild(btn);
+  });
+
+  function selectCategory(cat) {
+    activeCategory = cat;
+    document.querySelectorAll('.tab').forEach(t =>
+      t.classList.toggle('active', t.textContent === cat));
+    document.getElementById('search').value = '';
+    applyFilter();
+  }
+
+  let filteredCards = [];
+  let current = 0;
+  let randomMode = false;
+
+  function applyFilter() {
+    const query = document.getElementById('search').value.toLowerCase();
+    filteredCards = family.filter(w => {
+      const matchCat = activeCategory === 'Todas' || w.cat === activeCategory;
+      let matchSearch = true;
+      if (query) {
+        if (w.type === 'single') {
+          matchSearch = w.sgM.toLowerCase().includes(query) ||
+            w.plM.toLowerCase().includes(query) ||
+            w.sg.includes(query) || w.pl.includes(query) ||
+            w.sgR.toLowerCase().includes(query) || w.plR.toLowerCase().includes(query);
+        } else {
+          matchSearch = w.mSgM.toLowerCase().includes(query) ||
+            w.fSgM.toLowerCase().includes(query) ||
+            w.mPlM.toLowerCase().includes(query) ||
+            w.fPlM.toLowerCase().includes(query) ||
+            w.mSg.includes(query) || w.fSg.includes(query) ||
+            w.mSgR.toLowerCase().includes(query) || w.fSgR.toLowerCase().includes(query);
+        }
+      }
+      return matchCat && matchSearch;
+    });
+    current = 0;
+    renderCard();
+  }
+
+  function filterCards() { applyFilter(); }
+
+  function renderCard() {
+    const frontEl = document.getElementById('front');
+    const backEl  = document.getElementById('back');
+    document.getElementById('card-inner').classList.remove('flipped');
+
+    if (!filteredCards.length) {
+      frontEl.innerHTML = '<div class="no-results">Sin resultados</div>';
+      backEl.innerHTML = '';
+      document.getElementById('counter').textContent = '0 / 0';
+      return;
+    }
+
+    const w = filteredCards[current];
+    document.getElementById('counter').textContent = `${current + 1} / ${filteredCards.length}`;
+
+    if (w.type === 'single') {
+      frontEl.innerHTML = `
+        <div class="category-label">${w.cat}</div>
+        <div class="gender-tag both">♂ ♀ género único</div>
+        <div class="front-block">
+          <div class="arabic-sg">${w.sg}</div>
+          <div class="front-divider">· · ·</div>
+          <div class="arabic-pl">${w.pl}</div>
+        </div>
+        <div class="hint">toca para ver la respuesta</div>
+      `;
+      backEl.innerHTML = `
+        <div class="back-section">
+          <div class="back-person-label">singular</div>
+          <div class="back-arabic-sg">${w.sg}</div>
+          <div class="back-roman-sg">${w.sgR}</div>
+          <div class="back-meaning">${w.sgM}</div>
+        </div>
+        <div class="back-divider"></div>
+        <div class="back-section">
+          <div class="back-pl-label">plural</div>
+          <div class="back-arabic-pl">${w.pl}</div>
+          <div class="back-roman-pl">${w.plR}</div>
+          <div class="back-meaning-pl">${w.plM}</div>
+        </div>
+      `;
+    } else {
+      frontEl.innerHTML = `
+        <div class="category-label">${w.cat}</div>
+        <div class="front-dual">
+          <div class="front-col">
+            <div class="gender-tag masc">♂ masculino</div>
+            <div class="arabic-sg-masc">${w.mSg}</div>
+            <div class="col-pl-label">plural</div>
+            <div class="arabic-pl-masc">${w.mPl}</div>
+          </div>
+          <div class="front-col-divider"></div>
+          <div class="front-col">
+            <div class="gender-tag fem">♀ femenino</div>
+            <div class="arabic-sg-fem">${w.fSg}</div>
+            <div class="col-pl-label">plural</div>
+            <div class="arabic-pl-fem">${w.fPl}</div>
+          </div>
+        </div>
+        <div class="hint">toca para ver la respuesta</div>
+      `;
+      backEl.innerHTML = `
+        <div class="back-dual">
+          <div class="back-col">
+            <div class="back-arabic-sg-m">${w.mSg}</div>
+            <div class="back-roman-m">${w.mSgR}</div>
+            <div class="back-meaning-m">${w.mSgM}</div>
+            <div style="height:6px"></div>
+            <div class="back-pl-label-m">plural</div>
+            <div class="back-arabic-pl-m">${w.mPl}</div>
+            <div class="back-roman-pl-m">${w.mPlR}</div>
+            <div class="back-meaning-pl-m">${w.mPlM}</div>
+          </div>
+          <div class="back-col-divider"></div>
+          <div class="back-col">
+            <div class="back-arabic-sg-f">${w.fSg}</div>
+            <div class="back-roman-f">${w.fSgR}</div>
+            <div class="back-meaning-f">${w.fSgM}</div>
+            <div style="height:6px"></div>
+            <div class="back-pl-label-f">plural</div>
+            <div class="back-arabic-pl-f">${w.fPl}</div>
+            <div class="back-roman-pl-f">${w.fPlR}</div>
+            <div class="back-meaning-pl-f">${w.fPlM}</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  function flipCard() {
+    document.getElementById('card-inner').classList.toggle('flipped');
+  }
+
+  function nextCard() {
+    if (!filteredCards.length) return;
+    current = randomMode
+      ? Math.floor(Math.random() * filteredCards.length)
+      : (current + 1) % filteredCards.length;
+    renderCard();
+  }
+
+  function prevCard() {
+    if (!filteredCards.length) return;
+    current = randomMode
+      ? Math.floor(Math.random() * filteredCards.length)
+      : (current - 1 + filteredCards.length) % filteredCards.length;
+    renderCard();
+  }
+
+  function shuffleCards() {
+    for (let i = filteredCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+    }
+    current = 0;
+    renderCard();
+  }
+
+  function toggleRandom() {
+    randomMode = !randomMode;
+    const btn = document.getElementById('randomBtn');
+    btn.textContent = `🔀 Aleatorio: ${randomMode ? 'SÍ' : 'NO'}`;
+    btn.classList.toggle('active', randomMode);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+    if (e.key === 'ArrowRight') nextCard();
+    if (e.key === 'ArrowLeft') prevCard();
+  });
+
+  applyFilter();
+  </script>
+
+</body>
+</html>
